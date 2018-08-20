@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "edu.usc.dblab.cache.base";
+option java_outer_classname = "CacheProto";
+option objc_class_prefix = "Cache";
+package nvcache;
+
+// The greeting service definition.
+service NVCacheCoordinator {
+// Sends a greeting
+	rpc SayHello (HelloRequest) returns (HelloReply) {
+	}
+	rpc ReadConfig (ReadConfigRequest) returns (ReadConfigResponse) {
+	}
+}
+
+message Configuration {
+	int32 config_number = 1;
+	repeated string servers = 2;
+}
+
+message ReadConfigRequest {
+}
+
+message ReadConfigResponse {
+	AssignmentConfiguration configuration = 1;
+	WorkloadConfiguration workload = 2;
+}
+
+message Fragment {
+	string physical_server = 1;
+	string migrate_server = 2;
+	int32 fragment_id = 3;
+	int32 prev_fragment_cfg_id = 4;
+	int32 fragment_cfg_id = 5;
+	int32 next_fragment_cfg_id = 6;
+	enum FragmentState {
+		NORMAL = 0;
+		MIGRATE = 1;
+	}
+	FragmentState state = 7;
+	double frequency = 8;
+	repeated Range range = 9;
+}
+
+message Range {
+	int32 start = 1;
+	int32 end = 2;
+}
+
+message AssignmentConfiguration {
+	int32 config_number = 1;
+	repeated Fragment fragments = 2;
+
+	enum ServerState {
+		NORMAL = 0;
+		MIGRATION = 1;
+	}
+	map < string, ServerState > server_state_map = 3;
+}
+
+message WorkloadConfiguration {
+	int32 config_number = 1;
+	enum Workload {
+		NORMAL = 0;
+		HOT_IN = 1;
+		HOT_OUT = 2;
+		RANDOM = 3;
+		SHIFT = 4;
+	}
+
+	Workload workload = 2;
+	int32 base = 3;
+	int32 max = 4;
+	int32 param1 = 5;
+	int32 param2 = 6;
+	repeated Fragment fragments = 7;
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+	string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+	string message = 1;
+}
